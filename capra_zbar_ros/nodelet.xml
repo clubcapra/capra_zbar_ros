@@ -1,0 +1,7 @@
+<library path="lib/libcapra_zbar_ros">
+    <class name="capra/BarcodeZbarNodelet" type="capra::BarcodeZbarNodelet" base_class_type="nodelet::Nodelet">
+        <description>
+            Capra Zbar Nodelet.
+        </description>
+    </class>
+</library>
