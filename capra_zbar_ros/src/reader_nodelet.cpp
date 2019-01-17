@@ -34,7 +34,8 @@ private:
     // Subscriber
     std::shared_ptr<image_transport::ImageTransport> it_;
     image_transport::CameraSubscriber sub_camera_;
-    int queue_size_{};
+    int queue_size_;
+    std::string subscriber_image_;
 
     // Publisher
     std::mutex connect_mutex_;
@@ -58,6 +59,7 @@ void BarcodeZbarNodelet::onInit()
     scanner_.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
 
     // Read parameters
+    private_nh.param("subscriber_image", subscriber_image_, std::string("image_raw"));
     private_nh.param("queue_size", queue_size_, 5);
 
     ros::SubscriberStatusCallback connect_cb = std::bind(&BarcodeZbarNodelet::connectCb, this);
@@ -82,7 +84,7 @@ void BarcodeZbarNodelet::connectCb()
     {
         NODELET_INFO("Connect to Barcode Detector...");
         image_transport::TransportHints hints("raw", ros::TransportHints(), getPrivateNodeHandle());
-        sub_camera_ = it_->subscribeCamera("/capra/camera_3d/rgb/image_raw", static_cast<uint32_t>(queue_size_), &BarcodeZbarNodelet::imageCb, this, hints);
+        sub_camera_ = it_->subscribeCamera(subscriber_image_, static_cast<uint32_t>(queue_size_), &BarcodeZbarNodelet::imageCb, this, hints);
     }
 }
 
@@ -151,7 +153,7 @@ void BarcodeZbarNodelet::imageCb(const sensor_msgs::ImageConstPtr &image_msg,
 void BarcodeZbarNodelet::findBarcode(const cv::Mat& img, std::vector<Barcode>& detectedBarcodes)
 {
     cv::Mat img_gray;
-    cv::cvtColor(img_gray, img, CV_BGR2GRAY);
+    cv::cvtColor(img, img_gray, CV_BGR2GRAY);
 
     zbar::Image image(img.cols, img.rows, "Y800", img_gray.data, img.cols * img.rows);
 

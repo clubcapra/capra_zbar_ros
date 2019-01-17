@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="nodelet" type="nodelet" name="standalone_nodelet"  args="manager" output="screen"/>
+
+    <node pkg="nodelet" type="nodelet" name="image_publisher"
+        args="load image_publisher/image_publisher standalone_nodelet">
+        <param name="filename" value="$(find capra_zbar_ros)/test/sample/single_qr_code.png" />
+        <param name="flip_horizontal" value="false" />
+        <param name="flip_vertical" value="false" />
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="BarcodeZbarNodelet" args="load capra/BarcodeZbarNodelet standalone_nodelet" output="screen">
+        <param name="subscriber_image" type="str" value="/image_publisher/image_raw" />
+    </node>
+</launch>
